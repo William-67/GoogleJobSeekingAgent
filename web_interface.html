@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <title>AI 求职助手</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
+        #container { display: flex; height: 100vh; }
+        #sidebar {
+            width: 200px;
+            background: #333;
+            color: white;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #sidebar h2 { color: #fff; }
+        #sidebar ul { list-style: none; padding: 0; }
+        #sidebar li {
+            margin: 15px 0;
+            cursor: pointer;
+            color: #ccc;
+        }
+        #sidebar li:hover { color: white; }
+
+        #main {
+            flex: 1;
+            padding: 20px;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        #chatBox {
+            flex: 1;
+            background: #fff;
+            padding: 15px;
+            border: 1px solid #ccc;
+            overflow-y: auto;
+        }
+        .message { margin-bottom: 10px; }
+        .bot { color: #333; }
+        .user { text-align: right; color: #007bff; }
+
+        #inputBox {
+            display: flex;
+            margin-top: 10px;
+        }
+        #chatInput {
+            flex: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        #sendBtn {
+            padding: 10px 15px;
+            margin-left: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        #uploadArea {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        #status {
+            margin-top: 10px;
+            font-style: italic;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <div id="sidebar">
+            <h2>功能导航</h2>
+            <ul>
+                <li onclick="selectFeature('resume')">上传并分析简历</li>
+                <li onclick="selectFeature('search')">职位搜索</li>
+                <li onclick="selectFeature('match')">职位匹配</li>
+                <li onclick="selectFeature('interview')">面试准备</li>
+                <li onclick="selectFeature('track')">申请跟踪</li>
+            </ul>
+        </div>
+        <div id="main">
+            <div id="chatBox"></div>
+            <div id="inputBox">
+                <input type="text" id="chatInput" placeholder="请输入内容...">
+                <button id="sendBtn" onclick="sendMessage()">发送</button>
+            </div>
+            <div id="uploadArea">
+                拖拽简历到此处，或 <input type="file" id="fileInput">
+            </div>
+            <div id="status"></div>
+        </div>
+    </div>
+
+    <script>
+        function addMessage(text, sender) {
+            const chatBox = document.getElementById('chatBox');
+            const msg = document.createElement('div');
+            msg.className = 'message ' + sender;
+            msg.innerHTML = text.replace(/\n/g, '<br>');
+            chatBox.appendChild(msg);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('chatInput');
+            const text = input.value.trim();
+            if (text === '') return;
+
+            addMessage(text, 'user');
+            input.value = '';
+
+            const res = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ message: text })
+            });
+            const data = await res.json();
+            if (data.success){
+                addMessage(data.response, 'bot');
+            } else {
+                addMessage('❌ ' + data.error, 'bot');
+            }
+            
+        }
+
+        function selectFeature(feature) {
+            const features = {
+                'resume': '您已选择上传并分析简历，请上传PDF文件。',
+                'search': '请输入您想要搜索的职位关键词和地点，例如“前端工程师 北京”。',
+                'match': '您已选择职位匹配，请确保先上传简历。',
+                'track': '您已选择查看申请记录。系统正在检索中...',
+                'interview': '您已选择面试准备功能。请输入目标公司和职位。'
+            };
+            addMessage(features[feature], 'bot');
+        }
+
+        document.getElementById('fileInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                uploadResume(file);
+            }
+        });
+
+        const uploadArea = document.getElementById('uploadArea');
+        uploadArea.addEventListener('dragover', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '#f0f8ff';
+        });
+        uploadArea.addEventListener('dragleave', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '';
+        });
+        uploadArea.addEventListener('drop', function(e) {
+            e.preventDefault();
+            this.style.backgroundColor = '';
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                uploadResume(files[0]);
+            }
+        });
+
+        async function uploadResume(file) {
+            document.getElementById('status').textContent = '正在上传简历...';
+            const formData = new FormData();
+            formData.append('file', file);
+
+            const res = await fetch('/api/upload_resume', {
+                method: 'POST',
+                body: formData
+            });
+
+            const data = await res.json();
+            if (data.status === 'success') {
+                addMessage('✅ 简历分析完成：<br>' + data.analysis.replace(/\n/g, '<br>'), 'bot');
+                document.getElementById('status').textContent = '分析完成';
+            } else {
+                addMessage('❌ 上传或分析失败。', 'bot');
+                document.getElementById('status').textContent = '失败';
+            }
+        }
+
+        document.getElementById('chatInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+
+        document.addEventListener('DOMContentLoaded', function() {
+            addMessage('👋 欢迎使用AI求职助手！我可以帮您：\n\n• 分析和优化简历\n• 搜索匹配的职位\n• 准备面试材料\n• 跟踪求职进度\n\n请选择左侧功能或直接告诉我您需要什么帮助？', 'bot');
+        });
+    </script>
+</body>
+</html>
