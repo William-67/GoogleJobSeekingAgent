@@ -72,13 +72,12 @@ def upload_resume():
             # 保存临时文件
             with tempfile.NamedTemporaryFile(delete=False, suffix='.pdf') as temp_file:
                 file.save(temp_file.name)
-                
                 # 分析简历
                 result = agent.upload_resume(temp_file.name)
                 
                 # 删除临时文件
-                os.unlink(temp_file.name)
-                
+                # os.unlink(temp_file.name)
+ 
                 return jsonify({
                     'success': True,
                     'analysis': result['analysis'],
@@ -86,7 +85,6 @@ def upload_resume():
                 })
         else:
             return jsonify({'error': '只支持PDF格式'}), 400
-            
     except Exception as e:
         return jsonify({'error': str(e)}), 500
 
@@ -222,6 +220,7 @@ if __name__ == '__main__':
     os.makedirs('data', exist_ok=True)
     
     # 启动应用
+    app.config['DEBUG'] = True
     port = int(os.environ.get('PORT', 5000))
     debug = os.environ.get('DEBUG', 'False').lower() == 'true'
     
