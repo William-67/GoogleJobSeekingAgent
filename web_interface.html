@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>AI 求职助手</title>
+    <title>AI Job Seeking Assistant</title>
     <style>
         body { font-family: Arial, sans-serif; background: #f9f9f9; margin: 0; padding: 0; }
         #container { display: flex; height: 100vh; }
@@ -78,23 +78,23 @@
 <body>
     <div id="container">
         <div id="sidebar">
-            <h2>功能导航</h2>
+            <h2>Features</h2>
             <ul>
-                <li onclick="selectFeature('resume')">上传并分析简历</li>
-                <li onclick="selectFeature('search')">职位搜索</li>
-                <li onclick="selectFeature('match')">职位匹配</li>
-                <li onclick="selectFeature('interview')">面试准备</li>
-                <li onclick="selectFeature('track')">申请跟踪</li>
+                <li onclick="selectFeature('resume')">Upload & Analyze Resume</li>
+                <li onclick="selectFeature('search')">Job Search</li>
+                <li onclick="selectFeature('match')">Job Matching</li>
+                <li onclick="selectFeature('interview')">Interview Preparation</li>
+                <li onclick="selectFeature('track')">Application Tracking</li>
             </ul>
         </div>
         <div id="main">
             <div id="chatBox"></div>
             <div id="inputBox">
-                <input type="text" id="chatInput" placeholder="请输入内容...">
-                <button id="sendBtn" onclick="sendMessage()">发送</button>
+                <input type="text" id="chatInput" placeholder="Enter your message...">
+                <button id="sendBtn" onclick="sendMessage()">Send</button>
             </div>
             <div id="uploadArea">
-                拖拽简历到此处，或 <input type="file" id="fileInput">
+                Drag your resume here, or <input type="file" id="fileInput">
             </div>
             <div id="status"></div>
         </div>
@@ -134,11 +134,11 @@
 
         function selectFeature(feature) {
             const features = {
-                'resume': '您已选择上传并分析简历，请上传PDF文件。',
-                'search': '请输入您想要搜索的职位关键词和地点，例如“前端工程师 北京”。',
-                'match': '您已选择职位匹配，请确保先上传简历。',
-                'track': '您已选择查看申请记录。系统正在检索中...',
-                'interview': '您已选择面试准备功能。请输入目标公司和职位。'
+                'resume': 'You have selected to upload and analyze your resume. Please upload a PDF file.',
+                'search': 'Please enter job keywords and location you want to search for, e.g., "Frontend Engineer Beijing".',
+                'match': 'You have selected job matching. Please ensure your resume has been uploaded first.',
+                'track': 'You have selected to view application history. The system is retrieving...',
+                'interview': 'You have selected the interview preparation feature. Please enter the target company and position.'
             };
             addMessage(features[feature], 'bot');
         }
@@ -169,7 +169,7 @@
         });
 
         async function uploadResume(file) {
-            document.getElementById('status').textContent = '正在上传简历...';
+            document.getElementById('status').textContent = 'Uploading resume...';
             const formData = new FormData();
             formData.append('file', file);
 
@@ -180,11 +180,11 @@
 
             const data = await res.json();
             if (data.success) {
-                addMessage('✅ 简历分析完成：<br>' + data.analysis.replace(/\n/g, '<br>'), 'bot');
-                document.getElementById('status').textContent = '分析完成';
+                addMessage('✅ Resume analysis complete:<br>' + data.analysis.replace(/\n/g, '<br>'), 'bot');
+                document.getElementById('status').textContent = 'Analysis complete';
             } else {
-                addMessage('❌ 上传或分析失败。', 'bot');
-                document.getElementById('status').textContent = '失败';
+                addMessage('❌ Upload or analysis failed.', 'bot');
+                document.getElementById('status').textContent = 'Failed';
             }
         }
 
@@ -195,7 +195,7 @@
         });
 
         document.addEventListener('DOMContentLoaded', function() {
-            addMessage('👋 欢迎使用AI求职助手！我可以帮您：\n\n• 分析和优化简历\n• 搜索匹配的职位\n• 准备面试材料\n• 跟踪求职进度\n\n请选择左侧功能或直接告诉我您需要什么帮助？', 'bot');
+            addMessage('👋 Welcome to AI Job Seeking Assistant! I can help you with:\n\n• Analyze and optimize your resume\n• Search for matching jobs\n• Prepare interview materials\n• Track job application progress\n\n Please select a feature on the left or tell me directly what you need help with?', 'bot');
         });
     </script>
 </body>

@@ -9,10 +9,11 @@ class JobSeekingAgent:
     def __init__(self, gemini_api_key):
         load_dotenv()
         genai.configure(api_key=gemini_api_key)
-        self.model = genai.GenerativeModel("gemini-1.5-flash-001")
+        self.model = genai.GenerativeModel("gemini-2.5-flash")
         self.setup_database()
 
     def setup_database(self):
+        """Sets up the SQLite database for storing resumes and job positions."""
         conn = sqlite3.connect('job_search.db')
         cursor = conn.cursor()
         cursor.execute('''
@@ -39,10 +40,12 @@ class JobSeekingAgent:
         conn.close()
 
     def _ask_gemini(self, prompt: str) -> str:
+        """Sends a prompt to the Gemini model and returns the response."""
         response = self.model.generate_content(prompt)
         return response.text.strip()
 
     def upload_resume(self, file_path):
+        """Uploads and analyzes a resume from a PDF file."""
         import fitz  # PyMuPDF
         with fitz.open(file_path) as doc:
             text = "\n".join(page.get_text() for page in doc)
@@ -58,37 +61,39 @@ class JobSeekingAgent:
         return {"status": "success", "analysis": analysis}
 
     def analyze_resume(self, resume_content):
+        """Analyzes the given resume content and provides optimization suggestions."""
         prompt = f"""
-你是一位资深HR，请分析以下简历内容并提出优化建议：
+You are a senior HR. Please analyze the following resume content and provide optimization suggestions:
 
-简历内容：
+Resume Content:
 {resume_content}
 
-请从以下方面进行分析：
-1. 简历结构与排版
-2. 技能匹配程度
-3. 工作经历描述
-4. 教育背景
-5. 建议补充内容
-6. 具体优化建议
+Please analyze from the following aspects:
+1. Resume structure and formatting
+2. Skill matching degree
+3. Work experience description
+4. Education background
+5. Suggested additional content
+6. Specific optimization suggestions
         """
         return self._ask_gemini(prompt)
 
     def search_jobs(self, query):
+        """Searches for job positions based on the given query."""
         mock_jobs = [
             {
-                "title": f"{query} 工程师",
-                "company": "科技公司A",
-                "location": "北京",
-                "description": f"负责{query}相关开发",
-                "requirements": "熟练掌握相关技能，有3年经验"
+                "title": f"{query} Engineer",
+                "company": "Tech Company A",
+                "location": "Beijing",
+                "description": f"Responsible for {query}-related development",
+                "requirements": "Proficient in relevant skills, 3 years of experience"
             },
             {
-                "title": f"高级{query}开发工程师",
-                "company": "科技公司B",
-                "location": "上海",
-                "description": f"参与{query}系统设计与开发",
-                "requirements": "本科以上学历，5年以上经验"
+                "title": f"Senior {query} Development Engineer",
+                "company": "Tech Company B",
+                "location": "Shanghai",
+                "description": f"Participate in {query} system design and development",
+                "requirements": "Bachelor's degree or above, 5+ years of experience"
             }
         ]
         conn = sqlite3.connect('job_search.db')
@@ -103,6 +108,7 @@ class JobSeekingAgent:
         return json.dumps(mock_jobs, ensure_ascii=False)
 
     def match_jobs(self, resume_content):
+        """Matches the resume content with available job positions."""
         conn = sqlite3.connect('job_search.db')
         cursor = conn.cursor()
         cursor.execute('SELECT * FROM job_positions ORDER BY created_at DESC LIMIT 10')
@@ -110,36 +116,38 @@ class JobSeekingAgent:
         conn.close()
 
         if not jobs:
-            return "暂无职位数据，请先搜索职位。"
+            return "No job data available. Please search for jobs first."
 
         jobs_text = "\n".join([f"{job[1]} at {job[2]}: {job[4]}" for job in jobs])
         prompt = f"""
-以下是求职者简历内容和职位信息，请匹配出最合适的3个岗位并说明匹配理由：
+Below is the job seeker's resume content and job information. Please match the 3 most suitable positions and explain the reasons for the match:
 
-简历内容：
+Resume Content:
 {resume_content}
 
-职位列表：
+Job List:
 {jobs_text}
         """
         return self._ask_gemini(prompt)
 
     def prepare_interview(self, company_and_position):
+        """Prepares interview advice for a given company and position."""
         prompt = f"""
-请为我准备以下职位的面试建议：{company_and_position}
+Please prepare interview advice for the following position: {company_and_position}
 
-内容包括：
-1. 公司背景调研
-2. 可能面试问题（技术+行为）
-3. 建议准备的项目案例
-4. 提问建议
-5. 注意事项
+Content includes:
+1. Company background research
+2. Possible interview questions (technical + behavioral)
+3. Suggested project cases to prepare
+4. Questions to ask
+5. Important considerations
         """
         return self._ask_gemini(prompt)
 
     def track_application(self, action):
+        """Tracks job applications."""
         if action != "view":
-            return "暂不支持其他操作。"
+            return "Other operations are not supported at this time."
 
         conn = sqlite3.connect('job_search.db')
         cursor = conn.cursor()
@@ -148,9 +156,10 @@ class JobSeekingAgent:
         conn.close()
 
         if not apps:
-            return "暂无申请记录。"
+            return "No application records found."
 
         return "\n".join([f"- {job[1]} at {job[2]}" for job in apps])
 
     def chat(self, message):
+        """Handles general chat messages."""
         return self._ask_gemini(message)
