@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Smart Job Seeker</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="container">
+        <h2>Upload Resume & Describe Your Ideal Job</h2>
+        <form method="POST" enctype="multipart/form-data">
+            <label>Upload Resume (.pdf or .txt):</label><br>
+            <input type="file" name="resume" accept=".pdf,.txt" required><br><br>
+            <label>Describe your job preferences (skills, experience, location, etc):</label><br>
+            <textarea name="requirements" rows="6" cols="50" required></textarea><br><br>
+            <button type="submit">Analyze & Search</button>
+        </form>
+        <p><a href="/chat">Or chat with the assistant →</a></p>
+    </div>
+</body>
+</html>
