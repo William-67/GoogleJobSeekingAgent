@@ -4,9 +4,28 @@
 <body>
     <div class="container">
         <h2>Resume Analysis</h2>
-        <div>{{ resume_result|safe }}</div>
+        <div class="resume-card">{{ resume_result|safe }}</div>
+
         <h2>Matched Jobs</h2>
-        <div>{{ job_summary|safe }}</div>
+        {% if job_list %}
+            {% for job in job_list %}
+                <div class="job-card">
+                    <h3>{{ job.title }}</h3>
+                    <p><strong>Company:</strong> {{ job.company }}</p>
+                    <p><strong>Location:</strong> {{ job.location }}</p>
+                    <p><strong>Summary:</strong> {{ job.summary }}</p>
+                    <p><strong>Link:</strong>
+                        {% if job.link != 'N/A' %}
+                            <a href="{{ job.link }}" target="_blank">Apply Here</a>
+                        {% else %}
+                            Not available
+                        {% endif %}
+                    </p>
+                </div>
+            {% endfor %}
+        {% else %}
+            <p>No jobs found or matched.</p>
+        {% endif %}
         <p><a href="/">← Back</a></p>
     </div>
 </body>
