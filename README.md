@@ -5,15 +5,16 @@ job-seeking-ai/
 ├── app.py                    # Flask backend services
 
 ├── templates/			# Front end page
-	├── chat.html		# Chat page
+
+  ├── chat.html		# Chat page
  
-	├── chat_history.html	# Check chat history page
+  ├── chat_history.html	# Check chat history page
  
-	├── index.html		# Main page
+  ├── index.html		# Main page
  
-	├── results.html	# Search result page
+  ├── results.html	# Search result page
  
-	└── start_chat.html 
+  └── start_chat.html 
  
 ├── requirements.txt          # Python Dependencies
 
