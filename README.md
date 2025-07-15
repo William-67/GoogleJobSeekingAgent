@@ -1,16 +1,29 @@
 job-seeking-ai/
+
 ├── job_seeking_agent.py      # Agent handling job seek
+
 ├── app.py                    # Flask backend services
+
 ├── templates/			# Front end page
+
 	├── chat.html		# Chat page
+ 
 	├── chat_history.html	# Check chat history page
+ 
 	├── index.html		# Main page
+ 
 	├── results.html	# Search result page
+ 
 	└── start_chat.html 
+ 
 ├── requirements.txt          # Python Dependencies
+
 ├── config.py               # configuration
+
 ├── utils.py			
+
 ├── chats.py			#handling chat functions
+
 └── README.md               
 
 # 1. Clone the code
