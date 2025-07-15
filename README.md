@@ -5,7 +5,6 @@ job-seeking-ai/
 ├── app.py                    # Flask backend services
 
 ├── templates/			# Front end page
-
 	├── chat.html		# Chat page
  
 	├── chat_history.html	# Check chat history page
