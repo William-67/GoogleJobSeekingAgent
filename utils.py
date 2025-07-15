@@ -1,5 +1,6 @@
 import fitz
 import google.generativeai as genai
+import openai
 import os
 from config import Config
 
@@ -7,6 +8,9 @@ from config import Config
 # genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 genai.configure(api_key=Config.GEMINI_API_KEY)
 model = genai.GenerativeModel("gemini-1.5-flash")
+
+# openai.api_key = Config.OPENAI_API_KEY
+
 
 def extract_text_from_file(file_path):
     if file_path.endswith(".pdf"):

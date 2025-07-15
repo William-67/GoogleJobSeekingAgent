@@ -1,21 +1,110 @@
 <!DOCTYPE html>
 <html>
-<head><title>Chat</title><link rel="stylesheet" href="/static/style.css"></head>
+<head>
+  <title>Chat</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
 <body>
 <div class="container">
     <h2>Chat with Career Assistant</h2>
-    <form method="POST" enctype="multipart/form-data">
+
+    <!-- <form method="POST" enctype="multipart/form-data">
         <label>Upload resume (optional):</label><br>
         <input type="file" name="resume" accept=".pdf,.txt"><br><br>
 
         <textarea name="message" rows="4" cols="50" placeholder="Ask anything..."></textarea><br><br>
         <button type="submit">Send</button>
-    </form>
+    </form> -->
+
+    {% if not chat.resume %}
+        <form method="POST" enctype="multipart/form-data">
+            <label>Upload resume (only once):</label><br>
+            <input type="file" name="resume" accept=".pdf,.txt" required><br><br>
+            <textarea name="message" rows="4" cols="50" placeholder="Ask anything..."></textarea><br><br>
+            <button type="submit">Send</button>
+        </form>
+    {% else %}
+        <form method="POST">
+            <textarea name="message" rows="4" cols="50" placeholder="Ask anything..."></textarea><br><br>
+            <button type="submit">Send</button>
+        </form>
+        <p>✅ Resume uploaded and used in context.</p>
+    {% endif %}
+
+
+    <h2>{{ chat.title or "Chat" }}</h2>
+
+    {% for m in chat.messages %}
+        <div class="{{ m.role }}">
+            <strong>{{ m.role.capitalize() }}:</strong> {{ m.content }}
+        </div>
+        <br>
+    {% endfor %}
+
     {% if response %}
         <h3>Response:</h3>
         <div class="resume-card">{{ response|safe }}</div>
     {% endif %}
-    <p><a href="/">← Back</a></p>
+
+    <br>
+    <br>
+
+    <form id="renameForm" method="POST" action="/chat/{{ chat.id }}/rename">
+        <button type="button" onclick="promptForRename('{{ chat.id }}', '{{ chat.title }}')">Rename Chat</button>
+    </form>
+    <div id="renameMessage" style="display: none; color: green; margin-top: 10px;"></div>
+
+
+    <br>
+    <br>
+    <form method="POST" action="/chat/{{ chat.id }}/delete">
+        <button type="submit" onclick="return confirm('Are you sure you want to delete this chat?');">
+            🗑 Delete This Chat
+        </button>
+    </form>
+
+    <p><a href="/chat-history">← Back to Chat History</a></p>
+    <p><a href="/">← Back to Job Search</a></p>
+
 </div>
+
+<script>
+    function promptForRename(chatId, currentTitle) {
+        // Display a prompt box for the new title
+        const newTitle = prompt("Enter new title for the chat:", currentTitle);
+
+        // If the user clicked OK and entered a title (or kept the old one)
+        if (newTitle !== null && newTitle.trim() !== '') {
+            // Get the success message div
+            const renameMessageDiv = document.getElementById('renameMessage');
+            renameMessageDiv.textContent = 'Rename successful!';
+            renameMessageDiv.style.display = 'block';
+
+            // Create a temporary form to submit the new title
+            const tempForm = document.createElement('form');
+            tempForm.method = 'POST';
+            tempForm.action = `/chat/${chatId}/rename`;
+            tempForm.style.display = 'none'; // Hide the form
+
+            const input = document.createElement('input');
+            input.type = 'hidden';
+            input.name = 'new_title';
+            input.value = newTitle;
+            tempForm.appendChild(input);
+
+            document.body.appendChild(tempForm); // Add to the document
+
+            // Submit the form after a delay, allowing the success message to show
+            setTimeout(() => {
+                tempForm.submit(); // This will trigger the page reload/redirect
+            }, 2000); // 2000 milliseconds = 2 seconds
+        } else if (newTitle !== null) {
+            // User clicked OK but entered an empty string
+            alert("Chat title cannot be empty. Rename cancelled.");
+        }
+        // If newTitle is null, the user clicked Cancel, so do nothing.
+    }
+</script>
+
 </body>
 </html>

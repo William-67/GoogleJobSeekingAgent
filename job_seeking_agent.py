@@ -50,7 +50,7 @@ def summarize_jobs_with_llm(job_results, llm):
     prompt = "You are a job assistant AI. For each job below, return:" \
              "Title: <job title>\nCompany: <company name>\nLocation: <location>\nSummary: <one-line summary>\nLink: <link>\n\n"
 
-    for job in job_results[:5]:
+    for job in job_results:
         desc = job.get("description", "")
         desc_clean = desc.replace("\n", " ").replace("\r", " ").strip()
         desc_short = desc_clean[:300]

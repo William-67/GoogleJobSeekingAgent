@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Chat History</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div class="container">
+    <h2>🗂 Chat History</h2>
+    <ul>
+      {% for chat in chats %}
+        <li>
+          <a href="/chat/{{ chat.id }}">
+            {{ chat.title or "Untitled Chat" }} ({{ chat.created_at or "unknown date" }})
+          </a>
+        </li>
+      {% endfor %}
+    </ul>
+    <p><a href="/chat/new">➕ Start New Chat</a></p>
+    <p><a href="/">← Back to Job Search</a></p>
+  </div>
+</body>
+</html>

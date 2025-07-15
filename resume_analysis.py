@@ -1,30 +1,54 @@
 def analyze_resume_relevance(resume_text, user_prompt, llm):
-    prompt = f"""You're a career assistant AI. A user has uploaded their resume and written the following request:
+    prompt = f"""You are a career assistant AI.
 
-{user_prompt}
+The user has uploaded their resume and wants to search jobs with this query:
 
-Below is the content of their resume:
+"{user_prompt}"
+
+Here is their resume:
 {resume_text}
 
-Please analyze their resume and offer personalized suggestions on improvements, missing skills, or how well it fits their job goals. Format your response clearly.
-Please assess how well the resume matches this job query.
-- Highlight relevant skills or experience.
-- Mention gaps or improvements needed.
-- Keep it concise (use bullet points).
+Please:
+- Briefly list 3-5 points about how well the resume matches this job query, each as a clear bullet point.
+- List any obvious gaps as bullet points, each point separated by a blank line.
+- Use * or - as bullet points, and add a blank line between every bullet.
+- DO NOT write long paragraphs.
 
+Example output:
+
+* Strength: Has direct experience with Python programming.
+
+* Gap: Lacks Canadian work experience.
+
+* Recommendation: Add more teamwork examples.
 """
     return llm.generate(prompt)
 
-def full_resume_analysis(resume_text, llm):
-    prompt = f"""You are a resume review AI assistant.
 
-Here is a user's full resume:
-{resume_text}
+# def full_resume_analysis(resume_text, llm):
+#     prompt = f"""You are a resume review AI assistant.
 
-Please analyze it and give structured suggestions to improve format, content, keyword relevance, and clarity.
-Include sections for:
-- Strengths
-- Weaknesses
-- Recommendations
-"""
-    return llm.generate(prompt)
+# Here is a user's full resume:
+# {resume_text}
+
+# Please analyze it and give structured suggestions to improve format, content, keyword relevance, and clarity.
+# Include sections for:
+# - Strengths
+# - Weaknesses
+# - Recommendations
+
+# - List any obvious gaps as bullet points, each point separated by a blank line.
+# - Use * or - as bullet points, and add a blank line between every bullet.
+# - DO NOT write long paragraphs.
+
+# Example output:
+
+# * Strength: Has direct experience with Python programming.
+
+# * Gap: Lacks Canadian work experience.
+
+# * Recommendation: Add more teamwork examples.
+
+# """
+#     return llm.generate(prompt)
+
